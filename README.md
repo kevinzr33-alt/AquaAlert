@@ -7,7 +7,7 @@ Sistema inteligente desarrollado en el marco de la hackatón **Build with AI 202
 ## 🚀 Panel de Acceso Directo para el Jurado
 ¡Bienvenido, estimado jurado! Puede evaluar cada componente del proyecto haciendo clic directo en los siguientes accesos rápidos:
 
-* 🎥 **[VER VIDEO PITCH DE PRESENTACIÓN](AQUÍ_PEGAS_EL_LINK_DE_TU_VIDEO)**: Demostración del proyecto y defensa del modelo de negocio (3 minutos).
+* 🎥 **[VER VIDEO PITCH DE PRESENTACIÓN](https://drive.google.com/file/d/1EbXiENcbQSldDDSko2xckRL9hisY65pR/view?usp=drivesdk)**: Demostración del proyecto y defensa del modelo de negocio (3 minutos).
 * ⚙️ **[VER EL CÓDIGO DEL AGENTE IA (Python)](./main.py)**: Algoritmo central en Python que conecta **Gemini 2.5 Flash** con la telemetría y Twilio[cite: 2].
 * 🖥️ **[VER LA INTERFAZ DEL DASHBOARD (HTML)](./index.html)**: Estructura visual de la plataforma cyber-industrial para el operador de planta[cite: 2].
 * 📄 **[DESCARGAR DOCUMENTACIÓN COMPLETA (PDF)](./Documental-Hackaton1mm.pdf)**: Manual técnico extendido, matrices FODA, Lean Canvas y proyecciones financieras[cite: 2].
