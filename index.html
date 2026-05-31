@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AquaAlert IoT — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #040d14;
+    --bg2: #071520;
+    --bg3: #0a1e2e;
+    --card: #0d2237;
+    --border: rgba(0, 180, 255, 0.12);
+    --border2: rgba(0, 180, 255, 0.25);
+    --accent: #00b4ff;
+    --accent2: #00ffd5;
+    --warn: #ffaa00;
+    --danger: #ff3b3b;
+    --ok: #00e676;
+    --text: #e8f4fd;
+    --muted: #5a8aaa;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,180,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,180,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border2);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .logo-icon {
+    width: 48px; height: 48px;
+    border: 1.5px solid var(--accent);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 20px rgba(0,180,255,0.2);
+  }
+
+  .logo-text h1 {
+    font-family: var(--mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text p {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ok);
+    border: 1px solid rgba(0,230,118,0.3);
+    padding: 6px 14px;
+    border-radius: 100px;
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ok);
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .timestamp {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  /* KPI strip */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .kpi-card:hover { border-color: var(--border2); }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .kpi-card.ok::before { background: var(--ok); }
+  .kpi-card.warn::before { background: var(--warn); }
+  .kpi-card.danger::before { background: var(--danger); }
+  .kpi-card.info::before { background: var(--accent); }
+
+  .kpi-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .kpi-value {
+    font-family: var(--mono);
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-card.ok .kpi-value { color: var(--ok); }
+  .kpi-card.warn .kpi-value { color: var(--warn); }
+  .kpi-card.danger .kpi-value { color: var(--danger); }
+  .kpi-card.info .kpi-value { color: var(--accent); }
+
+  .kpi-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* Main grid */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+
+  .panel-title {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-title::before {
+    content: '';
+    width: 3px; height: 14px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Sensor list */
+  .sensor-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 0.75rem;
+    transition: all 0.3s;
+    cursor: default;
+  }
+
+  .sensor-item:last-child { margin-bottom: 0; }
+  .sensor-item:hover { border-color: var(--border2); background: rgba(0,180,255,0.04); }
+
+  .sensor-item.emergency {
+    border-color: rgba(255,59,59,0.4);
+    background: rgba(255,59,59,0.06);
+    animation: blink-border 1s infinite;
+  }
+
+  .sensor-item.warning {
+    border-color: rgba(255,170,0,0.4);
+    background: rgba(255,170,0,0.06);
+  }
+
+  @keyframes blink-border {
+    0%, 100% { border-color: rgba(255,59,59,0.4); }
+    50% { border-color: rgba(255,59,59,0.9); }
+  }
+
+  .sensor-status-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-ok { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .dot-warn { background: var(--warn); box-shadow: 0 0 8px var(--warn); animation: pulse 1s infinite; }
+  .dot-danger { background: var(--danger); box-shadow: 0 0 8px var(--danger); animation: pulse 0.5s infinite; }
+
+  .sensor-info { flex: 1; min-width: 0; }
+
+  .sensor-id {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+
+  .sensor-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sensor-sector {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .sensor-readings {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .sensor-readings .val {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  .sensor-readings .lbl {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .sensor-risk {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    min-width: 52px;
+    text-align: center;
+  }
+
+  .risk-ok { background: rgba(0,230,118,0.12); color: var(--ok); }
+  .risk-warn { background: rgba(255,170,0,0.12); color: var(--warn); }
+  .risk-danger { background: rgba(255,59,59,0.15); color: var(--danger); }
+
+  /* Alert feed */
+  .alert-feed {
+    max-height: 420px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+
+  .alert-item {
+    display: flex;
+    gap: 12px;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .alert-item:last-child { border-bottom: none; }
+
+  .alert-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .alert-icon.emergency { background: rgba(255,59,59,0.15); }
+  .alert-icon.warning { background: rgba(255,170,0,0.12); }
+  .alert-icon.ok { background: rgba(0,230,118,0.1); }
+
+  .alert-content { flex: 1; min-width: 0; }
+
+  .alert-title {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .alert-meta {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  /* Bottom grid */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Action log */
+  .action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+  }
+
+  .action-row:last-child { border-bottom: none; }
+
+  .action-sensor {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    margin-bottom: 1px;
+  }
+
+  .action-cmd {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  .cmd-mantener { background: rgba(0,230,118,0.1); color: var(--ok); }
+  .cmd-reducir { background: rgba(255,170,0,0.1); color: var(--warn); }
+  .cmd-cerrar { background: rgba(255,59,59,0.12); color: var(--danger); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-brand {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .footer-brand span { color: var(--accent); }
+
+  .cycle-counter {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* Chart canvas containers */
+  .chart-wrap { position: relative; width: 100%; height: 220px; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .bottom-grid { grid-template-columns: 1fr; }
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">💧</div>
+      <div class="logo-text">
+        <h1>AquaAlert IoT</h1>
+        <p>Sistema autónomo de monitoreo hídrico · Santa Cruz, Bolivia</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        SISTEMA ACTIVO
+      </div>
+      <div class="timestamp" id="clock">--:--:--</div>
+    </div>
+  </header>
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip">
+    <div class="kpi-card ok">
+      <div class="kpi-label">Sensores operativos</div>
+      <div class="kpi-value">4</div>
+      <div class="kpi-sub">de 5 en línea</div>
+    </div>
+    <div class="kpi-card danger">
+      <div class="kpi-label">Emergencias activas</div>
+      <div class="kpi-value">1</div>
+      <div class="kpi-sub">SEC-C-07 · Ruptura crítica</div>
+    </div>
+    <div class="kpi-card warn">
+      <div class="kpi-label">Alertas preventivas</div>
+      <div class="kpi-value">2</div>
+      <div class="kpi-sub">Micro-fugas en progreso</div>
+    </div>
+    <div class="kpi-card info">
+      <div class="kpi-label">Pérdida estimada</div>
+      <div class="kpi-value">4.8K</div>
+      <div class="kpi-sub">Bolivianos · ciclo actual</div>
+    </div>
+  </div>
+
+  <!-- Main grid: sensors + alerts -->
+  <div class="main-grid">
+
+    <!-- Sensor status -->
+    <div class="panel">
+      <div class="panel-title">Estado de sensores en tiempo real</div>
+
+      <div class="sensor-item emergency">
+        <div class="sensor-status-dot dot-danger"></div>
+        <div class="sensor-info">
+          <div class="sensor-id">SEC-C-07</div>
+          <div class="sensor-name">Red Comercial Centro</div>
+          <div class="sensor-sector">Zona Comercial Centro</div>
+        </div>
+        <div class="sensor-readings">
+          <div class="val">8.4 PSI</div>
+          <div class="lbl">Presión</div>
+          <div class="val">138.2 L/min</div>
+          <div class="lbl">Flujo</div>
+        </div>
+        <div class="sensor-risk risk-danger">100%</div>
+      </div>
+
+      <div class="sensor-item warning">
+        <div class="sensor-status-dot dot-warn"></div>
+        <div class="sensor-info">
+          <div class="sensor-id">SEC-E-03</div>
+          <div class="sensor-name">Ramal Hospitalario</div>
+          <div class="sensor-sector">Zona Crítica Salud</div>
+        </div>
+        <div class="sensor-readings">
+          <div class="val">41.2 PSI</div>
+          <div class="lbl">Presión</div>
+          <div class="val">22.5 L/min</div>
+          <div class="lbl">Flujo</div>
+        </div>
+        <div class="sensor-risk risk-warn">74%</div>
+      </div>
+
+      <div class="sensor-item warning">
+        <div class="sensor-status-dot dot-warn"></div>
+        <div class="sensor-info">
+          <div class="sensor-id">SEC-B-04</div>
+          <div class="sensor-name">Distribuidor Residencial Sur</div>
+          <div class="sensor-sector">Zona Residencial Sur</div>
+        </div>
+        <div class="sensor-readings">
+          <div class="val">33.1 PSI</div>
+          <div class="lbl">Presión</div>
+          <div class="val">17.8 L/min</div>
+          <div class="lbl">Flujo</div>
+        </div>
+        <div class="sensor-risk risk-warn">68%</div>
+      </div>
+
+      <div class="sensor-item">
+        <div class="sensor-status-dot dot-ok"></div>
+        <div class="sensor-info">
+          <div class="sensor-id">SEC-A-01</div>
+          <div class="sensor-name">Planta de Tratamiento Norte</div>
+          <div class="sensor-sector">Zona Industrial Norte</div>
+        </div>
+        <div class="sensor-readings">
+          <div class="val">54.7 PSI</div>
+          <div class="lbl">Presión</div>
+          <div class="val">91.3 L/min</div>
+          <div class="lbl">Flujo</div>
+        </div>
+        <div class="sensor-risk risk-ok">3%</div>
+      </div>
+
+      <div class="sensor-item">
+        <div class="sensor-status-dot dot-ok"></div>
+        <div class="sensor-info">
+          <div class="sensor-id">SEC-D-12</div>
+          <div class="sensor-name">Ducto Principal Este</div>
+          <div class="sensor-sector">Corredor Industrial Este</div>
+        </div>
+        <div class="sensor-readings">
+          <div class="val">61.9 PSI</div>
+          <div class="lbl">Presión</div>
+          <div class="val">118.4 L/min</div>
+          <div class="lbl">Flujo</div>
+        </div>
+        <div class="sensor-risk risk-ok">5%</div>
+      </div>
+    </div>
+
+    <!-- Alert feed -->
+    <div class="panel">
+      <div class="panel-title">Feed de eventos IA</div>
+      <div class="alert-feed">
+
+        <div class="alert-item">
+          <div class="alert-icon emergency">🚨</div>
+          <div class="alert-content">
+            <div class="alert-title">EMERGENCIA — Ruptura SEC-C-07</div>
+            <div class="alert-meta">CERRAR_VALVULA · Zona Comercial · hace 2 min</div>
+          </div>
+        </div>
+
+        <div class="alert-item">
+          <div class="alert-icon emergency">📱</div>
+          <div class="alert-content">
+            <div class="alert-title">WhatsApp enviado al personal</div>
+            <div class="alert-meta">+591 76091732 · hace 2 min</div>
+          </div>
+        </div>
+
+        <div class="alert-item">
+          <div class="alert-icon warning">⚠️</div>
+          <div class="alert-content">
+            <div class="alert-title">Micro-fuga detectada — SEC-E-03</div>
+            <div class="alert-meta">REDUCIR_PRESION · fallo en ~6h · hace 4 min</div>
+          </div>
+        </div>
+
+        <div class="alert-item">
+          <div class="alert-icon warning">⚠️</div>
+          <div class="alert-content">
+            <div class="alert-title">Anomalía progresiva — SEC-B-04</div>
+            <div class="alert-meta">REDUCIR_PRESION · fallo en ~9h · hace 5 min</div>
+          </div>
+        </div>
+
+        <div class="alert-item">
+          <div class="alert-icon ok">✅</div>
+          <div class="alert-content">
+            <div class="alert-title">SEC-A-01 — Operación normal</div>
+            <div class="alert-meta">MANTENER_NORMAL · hace 5 min</div>
+          </div>
+        </div>
+
+        <div class="alert-item">
+          <div class="alert-icon ok">✅</div>
+          <div class="alert-content">
+            <div class="alert-title">SEC-D-12 — Operación normal</div>
+            <div class="alert-meta">MANTENER_NORMAL · hace 5 min</div>
+          </div>
+        </div>
+
+        <div class="alert-item">
+          <div class="alert-icon warning">⚠️</div>
+          <div class="alert-content">
+            <div class="alert-title">Micro-fuga resuelta — SEC-B-04</div>
+            <div class="alert-meta">Ciclo anterior · presión restaurada · hace 12 min</div>
+          </div>
+        </div>
+
+        <div class="alert-item">
+          <div class="alert-icon ok">✅</div>
+          <div class="alert-content">
+            <div class="alert-title">Ciclo #7 completado — 5 sensores</div>
+            <div class="alert-meta">Tiempo total: 1m 18s · hace 13 min</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom grid: charts -->
+  <div class="bottom-grid">
+
+    <!-- Pressure chart -->
+    <div class="panel">
+      <div class="panel-title">Tendencia de presión por sensor (últimos 8 ciclos)</div>
+      <div class="chart-wrap">
+        <canvas id="pressureChart" role="img" aria-label="Gráfico de líneas mostrando tendencia de presión de 5 sensores en los últimos 8 ciclos">Tendencia de presión de sensores AquaAlert.</canvas>
+      </div>
+    </div>
+
+    <!-- Risk chart -->
+    <div class="panel">
+      <div class="panel-title">Probabilidad de fuga por sensor — ciclo actual</div>
+      <div class="chart-wrap">
+        <canvas id="riskChart" role="img" aria-label="Gráfico de barras horizontales mostrando probabilidad de fuga por sensor">Probabilidad de fuga: SEC-C-07 100%, SEC-E-03 74%, SEC-B-04 68%, SEC-A-01 3%, SEC-D-12 5%.</canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Action log -->
+  <div class="panel" style="margin-bottom: 1.5rem;">
+    <div class="panel-title">Log de comandos IoT ejecutados — ciclo #8</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem;">
+      <div>
+        <div class="action-row">
+          <div>
+            <div class="action-sensor">SEC-C-07 · Zona Comercial Centro</div>
+            <div style="color: var(--text); font-size: 0.82rem;">Ruptura catastrófica · flujo 138.2 L/min</div>
+          </div>
+          <div class="action-cmd cmd-cerrar">CERRAR_VALVULA</div>
+        </div>
+        <div class="action-row">
+          <div>
+            <div class="action-sensor">SEC-E-03 · Zona Crítica Salud</div>
+            <div style="color: var(--text); font-size: 0.82rem;">Micro-fuga · presión 41.2 PSI</div>
+          </div>
+          <div class="action-cmd cmd-reducir">REDUCIR_PRESION</div>
+        </div>
+        <div class="action-row">
+          <div>
+            <div class="action-sensor">SEC-B-04 · Zona Residencial Sur</div>
+            <div style="color: var(--text); font-size: 0.82rem;">Anomalía · presión 33.1 PSI</div>
+          </div>
+          <div class="action-cmd cmd-reducir">REDUCIR_PRESION</div>
+        </div>
+      </div>
+      <div>
+        <div class="action-row">
+          <div>
+            <div class="action-sensor">SEC-A-01 · Zona Industrial Norte</div>
+            <div style="color: var(--text); font-size: 0.82rem;">Normal · presión 54.7 PSI</div>
+          </div>
+          <div class="action-cmd cmd-mantener">MANTENER</div>
+        </div>
+        <div class="action-row">
+          <div>
+            <div class="action-sensor">SEC-D-12 · Corredor Industrial Este</div>
+            <div style="color: var(--text); font-size: 0.82rem;">Normal · presión 61.9 PSI</div>
+          </div>
+          <div class="action-cmd cmd-mantener">MANTENER</div>
+        </div>
+        <div class="action-row">
+          <div>
+            <div class="action-sensor">Twilio WhatsApp Gateway</div>
+            <div style="color: var(--text); font-size: 0.82rem;">2 alertas enviadas · 1 emergencia · 1 preventiva</div>
+          </div>
+          <div class="action-cmd cmd-cerrar" style="font-size: 0.65rem;">ENVIADO</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-brand">
+      <span>AquaAlert IoT</span> · Build with AI Hackathon 2026 · Santa Cruz de la Sierra, Bolivia
+    </div>
+    <div class="cycle-counter" id="cycleInfo">Ciclo #8 · próximo en <span id="countdown">60</span>s</div>
+  </footer>
+
+</div>
+
+<script>
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('es-BO', { hour12: false });
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Countdown
+  let sec = 60;
+  setInterval(() => {
+    sec = sec <= 1 ? 60 : sec - 1;
+    document.getElementById('countdown').textContent = sec;
+  }, 1000);
+
+  // Pressure trend chart
+  const labels = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8'];
+  new Chart(document.getElementById('pressureChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'SEC-A-01',
+          data: [55, 54, 56, 53, 57, 55, 54, 54.7],
+          borderColor: '#00e676',
+          backgroundColor: 'rgba(0,230,118,0.06)',
+          borderWidth: 2,
+          tension: 0.4,
+          pointRadius: 3,
+          fill: false,
+          borderDash: [],
+          pointStyle: 'circle',
+        },
+        {
+          label: 'SEC-B-04',
+          data: [48, 46, 43, 41, 38, 36, 34, 33.1],
+          borderColor: '#ffaa00',
+          backgroundColor: 'rgba(255,170,0,0.06)',
+          borderWidth: 2,
+          tension: 0.4,
+          pointRadius: 3,
+          fill: false,
+          borderDash: [5, 3],
+          pointStyle: 'triangle',
+        },
+        {
+          label: 'SEC-C-07',
+          data: [52, 49, 44, 38, 30, 20, 12, 8.4],
+          borderColor: '#ff3b3b',
+          backgroundColor: 'rgba(255,59,59,0.06)',
+          borderWidth: 2.5,
+          tension: 0.4,
+          pointRadius: 3,
+          fill: false,
+          borderDash: [],
+          pointStyle: 'rectRot',
+        },
+        {
+          label: 'SEC-D-12',
+          data: [63, 64, 62, 65, 60, 63, 62, 61.9],
+          borderColor: '#00b4ff',
+          backgroundColor: 'rgba(0,180,255,0.06)',
+          borderWidth: 2,
+          tension: 0.4,
+          pointRadius: 3,
+          fill: false,
+          borderDash: [3, 3],
+          pointStyle: 'rect',
+        },
+        {
+          label: 'SEC-E-03',
+          data: [58, 57, 55, 52, 49, 46, 43, 41.2],
+          borderColor: '#c792ea',
+          backgroundColor: 'rgba(199,146,234,0.06)',
+          borderWidth: 2,
+          tension: 0.4,
+          pointRadius: 3,
+          fill: false,
+          borderDash: [8, 4],
+          pointStyle: 'cross',
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+      },
+      scales: {
+        x: {
+          ticks: { color: '#5a8aaa', font: { family: 'Space Mono', size: 11 } },
+          grid: { color: 'rgba(0,180,255,0.06)' },
+          border: { color: 'rgba(0,180,255,0.15)' }
+        },
+        y: {
+          ticks: {
+            color: '#5a8aaa',
+            font: { family: 'Space Mono', size: 11 },
+            callback: v => v + ' PSI'
+          },
+          grid: { color: 'rgba(0,180,255,0.06)' },
+          border: { color: 'rgba(0,180,255,0.15)' }
+        }
+      }
+    }
+  });
+
+  // Custom legend pressure chart
+  const legendHtml = [
+    { label: 'SEC-A-01', color: '#00e676' },
+    { label: 'SEC-B-04', color: '#ffaa00' },
+    { label: 'SEC-C-07', color: '#ff3b3b' },
+    { label: 'SEC-D-12', color: '#00b4ff' },
+    { label: 'SEC-E-03', color: '#c792ea' },
+  ].map(d => `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px;font-size:11px;color:#5a8aaa"><span style="width:10px;height:10px;border-radius:2px;background:${d.color};display:inline-block"></span>${d.label}</span>`).join('');
+
+  document.querySelector('.panel:nth-child(1) .panel-title').insertAdjacentHTML('afterend',
+    `<div style="margin-bottom:12px;margin-top:-8px">${legendHtml}</div>`);
+
+  // Risk bar chart
+  new Chart(document.getElementById('riskChart'), {
+    type: 'bar',
+    data: {
+      labels: ['SEC-A-01', 'SEC-D-12', 'SEC-B-04', 'SEC-E-03', 'SEC-C-07'],
+      datasets: [{
+        label: 'Riesgo de fuga %',
+        data: [3, 5, 68, 74, 100],
+        backgroundColor: ['#00e676', '#00e676', '#ffaa00', '#ffaa00', '#ff3b3b'],
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.raw}% probabilidad de fuga`
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0, max: 100,
+          ticks: {
+            color: '#5a8aaa',
+            font: { family: 'Space Mono', size: 11 },
+            callback: v => v + '%'
+          },
+          grid: { color: 'rgba(0,180,255,0.06)' },
+          border: { color: 'rgba(0,180,255,0.15)' }
+        },
+        y: {
+          ticks: { color: '#5a8aaa', font: { family: 'Space Mono', size: 11 } },
+          grid: { color: 'transparent' },
+          border: { color: 'rgba(0,180,255,0.15)' }
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>
