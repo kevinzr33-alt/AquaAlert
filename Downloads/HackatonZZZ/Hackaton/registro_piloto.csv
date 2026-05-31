@@ -1,0 +1,4 @@
+Fecha_Hora,Sensor,Escenario_Simulado,Prediccion_Fuga_%,Tiempo_Falla_Horas,Accion_IoT,Validacion_Ingeniero_Planta
+2026-05-30 16:38:55,SEC-B-04,Operacion Normal,1,1000,MONITOREO_CONTINUO,PENDIENTE DE VERIFICACIÓN EN CAMPO
+2026-05-30 16:39:50,SEC-B-04,Micro-fuga Predictiva,75,36,REDUCIR_PRESION,PENDIENTE DE VERIFICACIÓN EN CAMPO
+2026-05-30 16:52:14,SEC-B-04,Micro-fuga Predictiva,85,4,REDUCIR_PRESION,8500.0,PENDIENTE (Auditoría Mensual)

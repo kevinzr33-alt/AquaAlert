@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AquaAlert Premium</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{margin:0;font-family:Segoe UI,sans-serif;background:#08111f;color:white}
+nav{position:fixed;top:0;width:100%;background:rgba(0,0,0,.75);padding:12px;z-index:1000}
+nav a{color:white;text-decoration:none;margin:0 12px}
+section{
+min-height:100vh;
+padding:90px 10%;
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
+position:relative;
+}
+section::before{
+content:'';position:absolute;inset:0;background:rgba(5,15,30,.72);
+}
+section>*{position:relative;z-index:1}
+h1,h2{color:#76e4ff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.card{background:rgba(255,255,255,.08);padding:20px;border-radius:16px;backdrop-filter:blur(6px)}
+.chart-container{max-width:500px;margin:auto;background:white;border-radius:20px;padding:20px}
+</style>
+</head>
+<body>
+
+<nav>
+<a href="#inicio">Inicio</a>
+<a href="#problema">Problema</a>
+<a href="#impacto">Impacto</a>
+<a href="#finanzas">Finanzas</a>
+</nav>
+
+<section id="inicio" style="background-image:url('https://images.unsplash.com/photo-1541944743827-e04aa6427c33');">
+<h1>💧 AquaAlert IoT</h1>
+<h2>Monitoreo hídrico predictivo + reactivo con IA</h2>
+<p>Imagen referencial: red de agua industrial.</p>
+</section>
+
+<section id="problema" style="background-image:url('https://images.unsplash.com/photo-1509395176047-4a66953fd231');">
+<h2>El Problema</h2>
+<div class="grid">
+<div class="card">45% del agua potable se pierde en fugas.</div>
+<div class="card">Doble pérdida: agua + energía.</div>
+<div class="card">PyMEs sin acceso a monitoreo.</div>
+</div>
+
+<div class="chart-container">
+<canvas id="pie1"></canvas>
+</div>
+</section>
+
+<section id="impacto" style="background-image:url('https://images.unsplash.com/photo-1521207418485-99c705420785');">
+<h2>Triple Impacto</h2>
+
+<div class="grid">
+<div class="card">💰 30% reducción de costos.</div>
+<div class="card">🌍 4.800 litros ahorrados por noche.</div>
+<div class="card">👥 Beneficio social y comunitario.</div>
+</div>
+
+<div class="chart-container">
+<canvas id="pie2"></canvas>
+</div>
+</section>
+
+<section id="finanzas" style="background-image:url('https://images.unsplash.com/photo-1554224155-6726b3ff858f');">
+<h2>Proyección Financiera</h2>
+
+<div class="chart-container">
+<canvas id="pie3"></canvas>
+</div>
+
+<div class="card">
+12.000 PyMEs industriales • 3.500 mercado objetivo • 60 clientes meta año 1 • $5.940 MRR
+</div>
+</section>
+
+<script>
+new Chart(document.getElementById('pie1'),{
+type:'pie',
+data:{
+labels:['Fugas','Agua aprovechada'],
+datasets:[{data:[45,55]}]
+}
+});
+
+new Chart(document.getElementById('pie2'),{
+type:'pie',
+data:{
+labels:['Económico','Ambiental','Social'],
+datasets:[{data:[30,45,25]}]
+}
+});
+
+new Chart(document.getElementById('pie3'),{
+type:'pie',
+data:{
+labels:['Mercado Total','Mercado Objetivo','Clientes Año 1'],
+datasets:[{data:[12000,3500,60]}]
+}
+});
+</script>
+
+</body>
+</html>
