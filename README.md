@@ -11,7 +11,7 @@ Sistema inteligente desarrollado en el marco de la hackatón **Build with AI 202
 * ⚙️ **[VER EL CÓDIGO DEL AGENTE IA (Python)](./main.py)**: Algoritmo central en Python que conecta **Gemini 2.5 Flash** con la telemetría y Twilio[cite: 2].
 * 🖥️ **[VER LA INTERFAZ DEL DASHBOARD (HTML)](./index.html)**: Estructura visual de la plataforma cyber-industrial para el operador de planta[cite: 2].
 * 📄 **[DESCARGAR DOCUMENTACIÓN COMPLETA (PDF)](./Documental-Hackaton1mm.pdf)**: Manual técnico extendido, matrices FODA, Lean Canvas y proyecciones financieras[cite: 2].
-* 📊 **[DESCARGAR DIAPOSITIVAS (PowerPoint)](./Power Point-hackaton1.pptx)**: Soporte visual y comercial de la presentación[cite: 2].
+* 📊 [DESCARGAR DIAPOSITIVAS (PowerPoint)](./Power%20Point-hackaton1.pptx): Soporte visual y comercial de la presentación[cite: 2].
 
 ---
 
