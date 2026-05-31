@@ -1,34 +1,26 @@
 # 💧 AquaAlert IoT — Sistema Autónomo de Monitoreo Hídrico Predictivo
 
-Sistema inteligente desarrollado en el marco de la hackatón **Build with AI 2026 (GDG Santa Cruz)** para la detección, predicción y mitigación autónoma de fugas de agua en redes industriales y comerciales de Santa Cruz de la Sierra, Bolivia.
+Sistema inteligente desarrollado en el marco de la hackatón **Build with AI 2026 (GDG Santa Cruz)** para la detección, predicción y mitigación autónoma de fugas de agua en redes industriales y comerciales de Santa Cruz de la Sierra, Bolivia[cite: 2].
+
+---
+
+## 🚀 Panel de Acceso Directo para el Jurado
+¡Bienvenido, estimado jurado! Puede evaluar cada componente del proyecto haciendo clic directo en los siguientes accesos rápidos:
+
+* 🎥 **[VER VIDEO PITCH DE PRESENTACIÓN](AQUÍ_PEGAS_EL_LINK_DE_TU_VIDEO)**: Demostración del proyecto y defensa del modelo de negocio (3 minutos).
+* ⚙️ **[VER EL CÓDIGO DEL AGENTE IA (Python)](./main.py)**: Algoritmo central en Python que conecta **Gemini 2.5 Flash** con la telemetría y Twilio[cite: 2].
+* 🖥️ **[VER LA INTERFAZ DEL DASHBOARD (HTML)](./index.html)**: Estructura visual de la plataforma cyber-industrial para el operador de planta[cite: 2].
+* 📄 **[DESCARGAR DOCUMENTACIÓN COMPLETA (PDF)](./Documental-Hackaton1mm.pdf)**: Manual técnico extendido, matrices FODA, Lean Canvas y proyecciones financieras[cite: 2].
+* 📊 **[DESCARGAR DIAPOSITIVAS (PowerPoint)](./Power Point-hackaton1.pptx)**: Soporte visual y comercial de la presentación[cite: 2].
 
 ---
 
 ## 👥 Equipo de Desarrollo (Syntax Labs)
-* **Kevin Brayton Zapata Rojas** — Desarrollo e Integración IoT
-* **Alan Navarro Limachi** — Negocio, Pitch y Validación
-* **Orlando Medina Rodriguez** — Agente IA y Backend
+* **Kevin Brayton Zapata Rojas** — Desarrollo e Integración IoT[cite: 2]
+* **Alan Navarro Limachi** — Negocio, Pitch y Validación[cite: 2]
+* **Orlando Medina Rodriguez** — Agente IA y Backend[cite: 2]
 
 ---
 
-## 📂 Recursos y Documentación Oficial
-Para facilitar la evaluación del jurado, se han adjuntado las versiones ejecutivas del proyecto directamente en la raíz de este repositorio:
-
-* 📄 **[Descargar Documentación Completa (Word)](./Documental-Hackaton1.docx)**: Manual técnico extendido, arquitectura de capas, matriz FODA, Lean Canvas y proyecciones financieras.
-* 📊 **[Descargar Presentación del Pitch (PowerPoint)](./AquaAlert-PitchDeck.pptx)**: Soporte visual y diapositivas comerciales diseñadas para el video de presentación de 2 minutos.
-
----
-
-## 🛠️ Arquitectura y Componentes del Repositorio
-* `main.py`: Código del Agente IA en Python que consume telemetría en tiempo real y ejecuta diagnósticos predictivos mediante **Gemini 2.5 Flash**.
-* `index.html`: Dashboard web interactivo con interfaz cyber-industrial para el monitoreo visual del operador de planta.
-* `.env`: Archivo de configuración protegido para variables de entorno (Gemini API y Twilio Business API para alertas de WhatsApp).
-* `requirements.txt`: Dependencias del entorno de ejecución de Python.
-
----
-
-## 🎯 Propuesta de Valor Central
-> *"Predecimos la fuga antes de que ocurra. No somos una alarma de incendios... somos el detector de humo."* 
-* **Anticipación predictiva:** 4 a 6 horas antes de la ruptura física mediante análisis de microgotas progresivas y flujos anómalos nocturnos.
-* **Costo Hardware:** Prototipo altamente accesible (\$17-\$34 USD) basado en sensores YF-S201 y microcontroladores ESP32.
-* **Impacto:** Reducción de hasta un 30% en las facturas de agua y energía de bombeo para el sector de las PyMEs industriales cruceñas.
+## 🛠️ Resumen de la Arquitectura
+El sistema opera en un ciclo autónomo continuo[cite: 2]. El script de Python simula lecturas de sensores hidráulicos en Santa Cruz[cite: 2]. Cuando detecta anomalías, el Agente de IA toma decisiones autónomas de mitigación y genera un reporte técnico que es despachado inmediatamente a los smartphones de los encargados mediante la API de WhatsApp de Twilio[cite: 2].
